@@ -1,0 +1,178 @@
+[
+    {
+        "id": "7cb07e5c.5aaf4",
+        "type": "tab",
+        "label": "Boy Scout Kit",
+        "disabled": false,
+        "info": ""
+    },
+    {
+        "id": "4764549f.52985c",
+        "type": "particle-SSE",
+        "z": "7cb07e5c.5aaf4",
+        "pcloud": "",
+        "subscribetype": "devid",
+        "devprodslug": "GPSBORON",
+        "devid": "",
+        "evtname": "gps",
+        "strict": 0,
+        "x": 410,
+        "y": 180,
+        "wires": [
+            [
+                "21b7c869.b1ef28"
+            ]
+        ]
+    },
+    {
+        "id": "78821054.11812",
+        "type": "inject",
+        "z": "7cb07e5c.5aaf4",
+        "name": "Ping_Particle",
+        "topic": "",
+        "payload": "",
+        "payloadType": "str",
+        "repeat": "5",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "x": 140,
+        "y": 180,
+        "wires": [
+            [
+                "4764549f.52985c"
+            ]
+        ]
+    },
+    {
+        "id": "8046bf62.33ec4",
+        "type": "debug",
+        "z": "7cb07e5c.5aaf4",
+        "name": "Debug",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "x": 690,
+        "y": 340,
+        "wires": []
+    },
+    {
+        "id": "9598aebb.ec1dc",
+        "type": "function",
+        "z": "7cb07e5c.5aaf4",
+        "name": "Rabbit1",
+        "func": "msg.payload = msg.payload.data\n\nlet m = msg.payload\n\nlet one = m.substr(0,9)\nlet name = m.substr(9,8)\n\nlet two = m.substr(17,7)\nlet lat = m.substr(24,9)\n\nlet three = m.substr(33,6)\nlet lon = m.substr(39,11)\n\nlet four = m.substr(50,3)\n\nlet icon = \"car\"\nlet iconColor = \"#3355FF\"\n//https://htmlcolorcodes.com/\nlet label = \"Rabbit1\"\n\n//lat = Number('lat');\n//lon = Number('lon');\n\nreturn {payload:{name:name,lat:lat,lon:lon,icon:icon,iconColor:iconColor,label:label}}\n//iconColor = Standard #rrggbb hex value\n//visit https://htmlcolorcodes.com/ for color codes",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 180,
+        "y": 280,
+        "wires": [
+            [
+                "e0733ea8.d7918"
+            ]
+        ],
+        "info": "\r\n//raw gps example\r\n//0310 53 23 2928 001 26 1244 220023 WNGN27S01003000000000003\r\n\r\nlet m = msg.payload\r\n\r\nlet name = m.substr(0,4)\r\n\r\nlet lat = m.substr(4,2)\r\nlet ma = m.substr(6,2)\r\nlet sa = m.substr(8,4)\r\n\r\nlet lon = m.substr(12,3)\r\nlet mo = m.substr(15,2)\r\nlet so = m.substr(17,4)\r\n\r\nlet hr = m.substr(21,2)\r\nlet mn = m.substr(23,2)\r\nlet se = m.substr(25,2)\r\n\r\nlet e = (m.substr(27,1) === \"E\") ? 1 : -1\r\nlet n = (m.substr(28,1) === \"N\") ? 1 : -1\r\n\r\nlat = (lat*1 + ma/60 + sa/360000) * n\r\nlon = (lon*1 + mo/60 + so/360000) * e\r\n\r\nlet icon = \"bus\";\r\n\r\nlet time = hr+\":\"+mn+\":\"+se\r\n\r\nreturn {payload:{name:name,lat:lat,lon:lon,time:time,icon:icon}}\r\n\r\n\r\nlet m = msg.payload\r\n\r\nlet vid = m.substr(0,4)\r\nlet lat = m.substr(4,2);\r\nlet mins = m.substr(6,2)\r\n//etc...\r\nreturn {payload:{vehicleid:vid,lat:lat,mins:mins}}\r\n\r\nlet m = msg.payload\r\n\r\n//{ lat:32.630070, lon:-116.976145 }\r\nlet lat = m.substr(6,9)\r\nlet lon = m.substr(21,11);\r\n\r\n//msg.payload = { name:\"BSK_Test\", lat:32.714819, lon:-117.163192 }\r\n\r\nreturn {payload:{ name:BSK_Test,lat:lat,lon:lon}}"
+    },
+    {
+        "id": "21b7c869.b1ef28",
+        "type": "change",
+        "z": "7cb07e5c.5aaf4",
+        "name": "Filter Message",
+        "rules": [
+            {
+                "t": "delete",
+                "p": "payload.ttl",
+                "pt": "msg"
+            },
+            {
+                "t": "delete",
+                "p": "payload.published_at",
+                "pt": "msg"
+            },
+            {
+                "t": "delete",
+                "p": "payload.coreid",
+                "pt": "msg"
+            },
+            {
+                "t": "delete",
+                "p": "payload.name",
+                "pt": "msg"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 680,
+        "y": 180,
+        "wires": [
+            [
+                "9598aebb.ec1dc"
+            ]
+        ]
+    },
+    {
+        "id": "e0733ea8.d7918",
+        "type": "change",
+        "z": "7cb07e5c.5aaf4",
+        "name": "Convert",
+        "rules": [
+            {
+                "t": "set",
+                "p": "payload.lat",
+                "pt": "msg",
+                "to": "$number(payload.lat)",
+                "tot": "jsonata"
+            },
+            {
+                "t": "set",
+                "p": "payload.lon",
+                "pt": "msg",
+                "to": "$number(payload.lon)",
+                "tot": "jsonata"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 400,
+        "y": 280,
+        "wires": [
+            [
+                "8046bf62.33ec4",
+                "8c20f663.03d198"
+            ]
+        ]
+    },
+    {
+        "id": "8c20f663.03d198",
+        "type": "worldmap",
+        "z": "7cb07e5c.5aaf4",
+        "name": "",
+        "lat": "32.714819",
+        "lon": "-117.163192",
+        "zoom": "12",
+        "layer": "OSM",
+        "cluster": "",
+        "maxage": "",
+        "usermenu": "show",
+        "layers": "hide",
+        "panit": "false",
+        "panlock": "false",
+        "zoomlock": "false",
+        "hiderightclick": "false",
+        "coords": "none",
+        "showgrid": "false",
+        "path": "/worldmap",
+        "x": 700,
+        "y": 280,
+        "wires": []
+    }
+]
